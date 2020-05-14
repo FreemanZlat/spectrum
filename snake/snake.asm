@@ -1,11 +1,20 @@
 	DEVICE ZXSPECTRUM48
 
+	MODULE main
+
 START_ADDRESS	EQU #8800
 INT_ADDRESS	EQU #80FF
 
+MENU_MAIN	EQU #00
+MENU_KEYS	EQU #01
+MENU_SCORES	EQU #02
+MENU_GAME	EQU #03
+MENU_GAMEOVER	EQU #04
+MENU_NAME	EQU #05
+
 
 	ORG START_ADDRESS
-START	ld (RES_SP+1), SP
+@START	ld (RES_SP+1), SP
 	ld SP, START_ADDRESS
 	push AF
 	push BC
@@ -50,22 +59,24 @@ MN_M	ld BC, KEY2_1
 	call KEY_PRESSED
 	or A
 	jr z, MN_M1
-	ld A, 1
+	ld A, MENU_KEYS
 	jp MN_CHNG
 
 MN_M1	ld BC, KEY2_2
 	call KEY_PRESSED
 	or A
 	jr z, MN_M2
-	ld A, 2
+	ld A, MENU_SCORES
 	jp MN_CHNG
 
 MN_M2	ld BC, (KEYS + 12)
 	call KEY_PRESSED
 	or A
 	jr z, MN_END
+	ld A, MENU_GAME
+	ld (MENU_TYPE), A
 	call START_GAME
-	ld A, 0
+	ld A, MENU_MAIN
 	jp MN_CHNG
 
 	; Redefine keys
@@ -73,7 +84,7 @@ MN_KS	ld BC, KEY2_SPACE
 	call KEY_PRESSED
 	or A
 	jr z, MN_END
-	ld A, 0
+	ld A, MENU_MAIN
 	jp MN_CHNG
 
 	; High scores
@@ -81,7 +92,7 @@ MN_HS	ld BC, KEY2_SPACE
 	call KEY_PRESSED
 	or A
 	jr z, MN_END
-	ld A, 0
+	ld A, MENU_MAIN
 	jp MN_CHNG
 
 MN_END	ld A, %00000000
@@ -108,7 +119,7 @@ RES_SP	ld SP, #0000
 	ret
 
 
-MENU_TYPE	DEFB #00
+MENU_TYPE	DEFB MENU_MAIN
 MENU_STATE	DEFB #00
 
 MENU_STR	DEFB "- = - = Game by Ivan Maklyakov, 2020 = ",0
@@ -135,11 +146,18 @@ INTERRUPTION:
 	ei
 	reti
 
+	ENDMODULE
+
 
 	INCLUDE "menu.asm"
 	INCLUDE "game.asm"
 	INCLUDE "sprites.asm"
 	INCLUDE "freelib.asm"
+
+SCORE		DEFB #00, #00, #00
+
+CONTROL_STATE	DEFB #00
+FRAME_TICK	DEFB #00
 
 	SAVETAP  "snake.tap", START
 
