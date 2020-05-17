@@ -334,6 +334,72 @@ RS_LP1	ld A, B
 	ret
 
 
+; HL - pixel coord
+@DOWN_HL_8
+	push AF
+
+	ld A, L
+	add %00100000
+	jr nc, DHL8_1
+	ex AF, AF'
+	ld A, H
+	add A, %00001000
+	ld H, A
+	ex AF, AF'
+
+DHL8_1	ld L, A
+
+	pop AF
+	ret
+
+
+; B - size y
+; C - size x
+; DE - char address
+; H - y
+; L - x
+@BOX_CHAR
+	push AF
+	push BC
+	push DE
+	push HL
+
+	ld (BA_DE + 1), DE
+
+	call COORD_PIX
+
+BA_LP0	push HL
+	push BC
+
+BA_LP1	push HL
+
+BA_DE	ld DE, #0000
+	DUP 8
+	ld A, (DE)
+	inc DE
+	ld (HL), A
+	inc H
+	EDUP
+
+	pop HL
+	inc L
+	dec C
+	jr nz, BA_LP1
+
+	pop BC
+	pop HL
+
+	call DOWN_HL_8
+	dec B
+	jr nz, BA_LP0
+
+	pop HL
+	pop DE
+	pop BC
+	pop AF
+	ret
+
+
 ; A - attribute
 ; B - size y
 ; C - size x
