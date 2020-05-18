@@ -9,16 +9,16 @@
 	push DE
 	push HL
 
-	ld (BA_DE + 1), DE
+	ld (BC_DE + 1), DE
 
 	call COORD_PIX
 
-BA_LP0	push HL
+BC_LP0	push HL
 	push BC
 
-BA_LP1	push HL
+BC_LP1	push HL
 
-BA_DE	ld DE, #0000
+BC_DE	ld DE, #0000
 	DUP 8
 	ld A, (DE)
 	inc DE
@@ -29,14 +29,14 @@ BA_DE	ld DE, #0000
 	pop HL
 	inc L
 	dec C
-	jr nz, BA_LP1
+	jr nz, BC_LP1
 
 	pop BC
 	pop HL
 
 	call DOWN_HL_8
 	dec B
-	jr nz, BA_LP0
+	jr nz, BC_LP0
 
 	pop HL
 	pop DE
@@ -44,6 +44,46 @@ BA_DE	ld DE, #0000
 	pop AF
 	ret
 
+
+; A - byte to fill
+; B - size y
+; C - size x
+; H - y
+; L - x
+@BOX_BYTE
+	push AF
+	push BC
+	push DE
+	push HL
+
+	call COORD_PIX
+
+	ld D, C
+BB_LP0	push HL
+	ld E, H
+
+BB_LP1	DUP 8
+	ld (HL), A
+	inc H
+	EDUP
+
+	ld H, E
+	inc L
+	dec C
+	jr nz, BB_LP1
+
+	ld C, D
+	pop HL
+
+	call DOWN_HL_8
+	dec B
+	jr nz, BB_LP0
+
+	pop HL
+	pop DE
+	pop BC
+	pop AF
+	ret
 
 ; A - attribute
 ; B - size y
@@ -83,50 +123,53 @@ BA_C	ld C, #00
 	ret
 
 
-; D - Attributes and border
-; E - Pixels
-@CLEAR_SCR
+; A - byte to fill
+@CLEAR_PIXELS
 	push AF
 	push BC
 	push HL
+	ld (CP_RESP + 1), SP
 
-	; Border color
-	ld A, D
-	and %00111000
-	rrca
-	rrca
-	rrca
-	out (#FE), A
-
-	ld (CS_RESP+1), SP
-
-	; Clear pixels
 	ld SP, SCR_PIXELS+SCR_PIXELS_S
 	ld BC, SCR_PIXELS_S/128
-	ld H, E
-	ld L, E
-CS_PIX	DUP 64
+	ld H, A
+	ld L, A
+CP_LP	DUP 64
 	push HL
 	EDUP
 	dec BC
 	ld A, B
 	or C
-	jp nz, CS_PIX
+	jp nz, CP_LP
 
-	; Clear attributes
+CP_RESP	ld SP, #0000
+
+	pop HL
+	pop BC
+	pop AF
+	ret
+
+
+; A - attr
+@CLEAR_ATTR
+	push AF
+	push BC
+	push HL
+	ld (CA_RESP + 1), SP
+
 	ld SP, SCR_ATTR+SCR_ATTR_S
 	ld BC, SCR_ATTR_S/128
-	ld H, D
-	ld L, D
-CS_ATR	DUP 64
+	ld H, A
+	ld L, A
+CA_LP	DUP 64
 	push HL
 	EDUP
 	dec BC
 	ld A, B
 	or C
-	jp nz, CS_ATR
+	jp nz, CA_LP
 
-CS_RESP	ld SP, #0000
+CA_RESP	ld SP, #0000
 
 	pop HL
 	pop BC
