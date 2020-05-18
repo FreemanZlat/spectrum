@@ -14,7 +14,7 @@ MENU_NAME	EQU #05
 
 
 	ORG START_ADDRESS
-@START	ld (RES_SP+1), SP
+@MAIN	ld (RES_SP+1), SP
 	ld SP, START_ADDRESS
 	push AF
 	push BC
@@ -27,9 +27,19 @@ MENU_NAME	EQU #05
 	ld DE, INTERRUPTION
 	call INIT_INT
 
-MENU_GO	ld HL, #0000
+START	call MENU_TITLE
+
+	ld HL, #0000
 	ld (MENU_STR_CNT), HL
-	call MENU_TITLE
+	ld A, MENU_MAIN
+	ld (MENU_TYPE), A
+
+
+MENU_GO	ld A, 0
+	ld BC, #0F20
+	ld HL, #0800
+	call BOX_BYTE
+
 	ld A, (MENU_TYPE)
 	call MENU_DRAW
 
@@ -76,8 +86,8 @@ MN_M2	ld BC, (KEYS + 12)
 	ld A, MENU_GAME
 	ld (MENU_TYPE), A
 	call START_GAME
-	ld A, MENU_MAIN
-	jp MN_CHNG
+
+	jp START
 
 	; Redefine keys
 MN_KS	ld BC, KEY2_SPACE
@@ -122,7 +132,7 @@ RES_SP	ld SP, #0000
 MENU_TYPE	DEFB MENU_MAIN
 MENU_STATE	DEFB #00
 
-MENU_STR	DEFB "- = - = Game by Ivan Maklyakov, 2020 = ",0
+MENU_STR	DEFB "- = - = Game by Ivan Maklyakov, 2020 = ", 0
 MENU_STR_BUF	DEFB 0, 0, 0, 0, 0, 0, 0, 0
 MENU_STR_CNT	DEFW #0000
 
@@ -159,5 +169,5 @@ SCORE		DEFB #00, #00, #00
 CONTROL_STATE	DEFB #00
 FRAME_TICK	DEFB #00
 
-	SAVETAP  "snake.tap", START
+	SAVETAP  "snake.tap", MAIN
 

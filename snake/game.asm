@@ -5,9 +5,12 @@
 	push DE
 	push HL
 
-	ld D, %01000111
-	ld E, %00000000
-	call CLEAR_SCR
+	ld A, 0
+	out (#FE), A
+	call CLEAR_PIXELS
+
+	ld A, %01000111
+	call CLEAR_ATTR
 
 	; Draw screen
 	; ...
@@ -23,6 +26,7 @@
 	ld (SPEED), A
 
 	; Init field
+	; ...
 
 	; Init snake and apple
 	; ...

@@ -6,9 +6,12 @@
 	push DE
 	push HL
 
-	ld D, %01000111
-	ld E, %00000000
-	call CLEAR_SCR
+	ld A, 0
+	out (#FE), A
+	call CLEAR_PIXELS
+
+	ld A, %01000111
+	call CLEAR_ATTR
 
 	ld HL, SCR_PIXELS
 	ld DE, MENU_DATA
@@ -115,8 +118,7 @@ MN_ELP	inc DE
 	jp MN_HS
 
 	; Main menu
-MN_M
-	ld DE, MENU_1
+MN_M	ld DE, MENU_1
 	ld HL, #0A08
 	call PRINT_STR
 
@@ -241,6 +243,7 @@ MN_END	pop HL
 	pop BC
 	pop AF
 	ret
+
 
 MENU_DATA
 	DEFB #F,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#0,#F
