@@ -130,8 +130,8 @@ BA_C	ld C, #00
 	push HL
 	ld (CP_RESP + 1), SP
 
-	ld SP, SCR_PIXELS+SCR_PIXELS_S
-	ld BC, SCR_PIXELS_S/128
+	ld SP, SCR_PIXELS + SCR_PIXELS_S
+	ld BC, SCR_PIXELS_S / 128
 	ld H, A
 	ld L, A
 CP_LP	DUP 64
@@ -157,8 +157,8 @@ CP_RESP	ld SP, #0000
 	push HL
 	ld (CA_RESP + 1), SP
 
-	ld SP, SCR_ATTR+SCR_ATTR_S
-	ld BC, SCR_ATTR_S/128
+	ld SP, SCR_ATTR + SCR_ATTR_S
+	ld BC, SCR_ATTR_S / 128
 	ld H, A
 	ld L, A
 CA_LP	DUP 64
